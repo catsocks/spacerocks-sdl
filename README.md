@@ -211,3 +211,4 @@ file.
 * [realfavicongenerator.net](https://realfavicongenerator.net)
 * [icoconvert.com](https://icoconvert.com) for generating the Windows executable .ico
 * [jsfxr](http://sfxr.me) for synthesizing the sound effects
+* ['Fork me on GitHub' SVG ribbons](https://github.com/Usecue/fork-me-on-github-svg-ribbons)
