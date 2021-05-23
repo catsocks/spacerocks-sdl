@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title translate="no">Spacerocks</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta property="og:title" content="Spacerocks">
+    <meta property="og:description"
+        content="Spacerocks is a clone of the Asteroids arcade game that you can play in the browser with a keyboard, gamepad and touch.">
+    <meta property="og:image" content="{{url}}/screenshot.png">
+    <meta property="og:url" content="{{url}}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{url}}/screenshot-2-by-1.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#000000">
+    <style>
+        :root {
+            --kbd-button-size: 50px;
+            --touch-button-size: 54px;
+            --gamepad-button-size: 54px;
+        }
+
+        body {
+            margin: 0;
+            font: 17px sans-serif;
+            color: white;
+            background: black;
+        }
+
+        #canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        #github-ribbon {
+            position: absolute;
+            right: 0;
+        }
+
+        #container {
+            margin: 0 auto;
+            padding: 0 1em;
+            max-width: 1040px;
+        }
+
+        header,
+        section,
+        footer {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        footer {
+            margin: 1em 0;
+        }
+
+        h1 {
+            font-size: 4em;
+            margin-bottom: 0.3em;
+        }
+
+        h2,
+        p {
+            text-align: center;
+        }
+
+        p a {
+            color: white;
+        }
+
+        main {
+            margin: 1em 0;
+        }
+
+        #grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-gap: 0 3em;
+        }
+
+        #gamepad-controls {
+            grid-column: span 2;
+        }
+
+        table {
+            border-spacing: 0 1em;
+        }
+
+        table tr td:first-child {
+            padding-right: 1em;
+            display: grid;
+            grid-gap: 0.5em;
+            grid-auto-flow: column;
+            justify-content: right;
+        }
+
+        kbd {
+            width: var(--kbd-button-size);
+            padding: 7px 9px;
+            box-sizing: border-box;
+            display: inline-block;
+            border: 0 solid #585858;
+            border-right-width: 4px;
+            border-bottom-width: 4px;
+            background: #323232;
+            font: inherit;
+        }
+
+        kbd:not(.function-key) {
+            height: var(--kbd-button-size);
+        }
+
+        kbd.function-key {
+            text-align: center;
+            font-size: 0.8em;
+        }
+
+        .touch-button {
+            opacity: .5;
+            height: var(--touch-button-size);
+            width: var(--touch-button-size);
+        }
+
+        .gamepad-button {
+            height: var(--gamepad-button-size);
+            width: var(--gamepad-button-size);
+        }
+
+        ul {
+            padding: 0;
+            list-style: none;
+        }
+
+        li {
+            text-align: center;
+        }
+
+        li:not(:last-child) {
+            margin-bottom: 1em;
+        }
+
+        .note {
+            font-size: 0.9em;
+            opacity: .7;
+        }
+
+        #fullscreen-note {
+            margin-top: 10px;
+        }
+
+        #play-link {
+            margin: 1em 0;
+            padding: 0.5em 1.7em;
+            border: 2px solid white;
+            border-radius: 7px;
+            background: black;
+            color: white;
+            text-decoration: none;
+            font-size: 1.6em;
+            font-weight: bold;
+        }
+
+        #play-link:hover {
+            background: white;
+            color: black;
+        }
+
+        @media all and (max-width: 700px) {
+            h1 {
+                font-size: 2.5em;
+                margin-top: 1em;
+            }
+
+            #github-ribbon img {
+                width: 110px;
+            }
+        }
+
+        @media all and (max-width: 1040px) {
+            section {
+                grid-column: 1 / 3;
+            }
+        }
+
+        @media screen and (orientation: landscape) {
+            #landscape-mode-note {
+                display: none;
+            }
+        }
+
+        @media print {
+            .no-print {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <canvas id="canvas" class="no-print"></canvas>
+    <a id="github-ribbon" class="no-print" href="https://github.com/catsocks/spacerocks-sdl">
+        <img src="github-ribbon.svg" alt="Fork me on GitHub" loading="lazy">
+    </a>
+    <div id="container">
+        <header>
+            <h1 translate="no">Spacerocks</h1>
+            <p>A clone of the <a href="https://en.wikipedia.org/wiki/Asteroids_%28video_game%29#Gameplay">Asteroids</a>
+                arcade game
+                that you can play in the browser with a keyboard, gamepad and touch.</p>
+            <p>Steer your ship clear of asteroids and saucers and score as many points as you can by destroying them.
+            </p>
+            <p>Insert 1 coin for a 1 player game and 2 for a 2 player game.</p>
+        </header>
+        <main>
+            <h2>Controls</h2>
+            <div id="grid">
+                <section>
+                    <h3>Keyboard</h3>
+                    <table>
+                        <tr>
+                            <td><kbd>C</kbd></td>
+                            <td>insert coin</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>1</kbd><kbd>2</kbd></td>
+                            <td>start 1 or 2 player game</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>A</kbd><kbd>D</kbd></td>
+                            <td>rotate left or right</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>W</kbd></td>
+                            <td>thrust forward</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>J</kbd></td>
+                            <td>fire missile</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>K</kbd></td>
+                            <td>enter hyperspace</td>
+                        </tr>
+                        <tr>
+                            <td><kbd>M</kbd></td>
+                            <td>toggle mute</td>
+                        </tr>
+                        <tr>
+                            <td><kbd class="function-key">F11</kbd></td>
+                            <td>toggle fullscreen</td>
+                        </tr>
+                        <tr>
+                            <td><kbd class="function-key">F9</kbd><kbd class="function-key">F10</kbd></td>
+                            <td>previous/next language</td>
+                        </tr>
+                    </table>
+                </section>
+                <section>
+                    <h3>Touch</h3>
+                    <table>
+                        <tr>
+                            <td><img class="touch-button" src="buttons/virtual-coin-button.svg"></td>
+                            <td>insert coin</td>
+                        </tr>
+                        <tr>
+                            <td><img class="touch-button" src="buttons/virtual-1p-button.svg"><img class="touch-button"
+                                    src="buttons/virtual-2p-button.svg"></td>
+                            <td>start 1 or 2 player game</td>
+                        </tr>
+                        <tr>
+                            <td><img class="touch-button" src="buttons/virtual-rotate-left-button.svg"><img
+                                    class="touch-button" src="buttons/virtual-rotate-right-button.svg"></td>
+                            <td>rotate left or right</td>
+                        </tr>
+                        <tr>
+                            <td><img class="touch-button" src="buttons/virtual-thrust-button.svg"></td>
+                            <td>thrust forward</td>
+                        </tr>
+                        <tr>
+                            <td><img class="touch-button" src="buttons/virtual-fire-button.svg"></td>
+                            <td>fire missile</td>
+                        </tr>
+                        <tr>
+                            <td><img class="touch-button" src="buttons/virtual-hyperspace-button.svg"></td>
+                            <td>enter hyperspace</td>
+                        </tr>
+                    </table>
+                    <ul>
+                        <li>Swipe up/down to turn <b>fullscreen</b> on/off. <div id="fullscreen-note" class="note no-print">Fullscreen is unavailable on some devices.</div></li>
+                    </ul>
+                </section>
+                <section id="gamepad-controls">
+                    <h3>Gamepad</h3>
+                    <p>Two are supported in a 2 player game.</p>
+                    <table>
+                        <tr>
+                            <td><img class="gamepad-button" src="buttons/gamepad-y-button.svg"></td>
+                            <td>insert coin</td>
+                        </tr>
+                        <tr>
+                            <td><img class="gamepad-button" src="buttons/gamepad-l1-button.svg"><img
+                                    class="gamepad-button" src="buttons/gamepad-r1-button.svg"></td>
+                            <td>start 1 or 2 player game</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img class="gamepad-button" src="buttons/gamepad-dpad-up-button.svg">
+                            </td>
+                            <td>thrust forward</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img class="gamepad-button" src="buttons/gamepad-dpad-left-button.svg">
+                                <img class="gamepad-button" src="buttons/gamepad-dpad-right-button.svg">
+                            </td>
+                            <td>rotate left or right</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img class="gamepad-button" src="buttons/gamepad-x-button.svg">
+                            </td>
+                            <td>fire missile</td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <img class="gamepad-button" src="buttons/gamepad-ball-button.svg">
+                            </td>
+                            <td>enter hyperspace</td>
+                        </tr>
+                    </table>
+                </section>
+            </div>
+        </main>
+        <footer class="no-print">
+            <p id="landscape-mode-note" class="note">You should switch to landscape mode.</p>
+            <a id="play-link" href="game.html" translate="no">Play</a>
+        </footer>
+    </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .catch((err) => {
+                    console.error(err);
+                })
+        }
+
+        // For drawing a simple background of asteroids.
+        const canvas = document.getElementById('canvas');
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+        const ctx = canvas.getContext('2d');
+
+        const world = {
+            width: document.body.clientWidth,
+            height: document.body.clientHeight,
+        };
+        window.onresize = handleResize;
+
+        const rocks = createRocks();
+
+        let startTime;
+        let currentTime;
+        window.requestAnimationFrame(loop);
+
+        function handleResize() {
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+
+            if (world.width < document.body.clientWidth) {
+                world.width = document.body.clientWidth;
+            }
+            if (world.height < document.body.clientHeight) {
+                world.height = document.body.clientHeight;
+            }
+        }
+
+        function createRocks() {
+            const maxWidth = 140;
+            const num = clamp(world.width / maxWidth, 5, 15);
+            const rocks = [];
+            for (let i = 0; i < num; i++) {
+                rocks.push(createRock(maxWidth));
+            }
+            return rocks;
+        }
+
+        function clamp(val, min, max) {
+            return Math.max(min, Math.min(max, val));
+        }
+
+        function createRock(maxWidth) {
+            const speed = randomRange(20, 30);
+            const direction = randomRange(0, 2 * Math.PI);
+
+            const rock = {
+                position: {
+                    x: Math.random() * world.width,
+                    y: Math.random() * world.height,
+                },
+                angle: 0,
+                velocity: {
+                    x: Math.cos(direction) * speed,
+                    y: Math.sin(direction) * speed,
+                },
+                angularVelocity: randomRange(-Math.PI / 14, Math.PI / 14),
+                points: createPolygon(maxWidth / 2, maxWidth),
+                canvasPoints: [],
+            };
+
+            for (const { x, y } of rock.points) {
+                rock.canvasPoints.push({ x, y });
+            }
+
+            return rock;
+        }
+
+        function randomRange(min, max) {
+            return min + (Math.random() * (max - min));
+        }
+
+        function createPolygon(minWidth, maxWidth) {
+            const numPoints = Math.floor(randomRange(10, 13));
+            const points = [];
+            for (let i = 0; i < numPoints; i++) {
+                const angle = (i / numPoints) * Math.PI * 2;
+                points.push({
+                    x: Math.sin(angle) * randomRange(minWidth / 2, maxWidth / 2),
+                    y: Math.cos(angle) * randomRange(minWidth / 2, maxWidth / 2),
+                });
+            }
+            return points;
+        }
+
+        function updateRocks(elapsedTime) {
+            for (const [i, rock] of rocks.entries()) {
+                rock.position.x += rock.velocity.x * elapsedTime;
+                rock.position.y += rock.velocity.y * elapsedTime;
+
+                rock.angle += rock.angularVelocity * elapsedTime;
+
+                rock.position.x = wrapAround(rock.position.x, world.width);
+                rock.position.y = wrapAround(rock.position.y, world.height);
+
+                for (const [j, point] of rock.points.entries()) {
+                    // Rotate point.
+                    const s = Math.sin(rock.angle);
+                    const c = Math.cos(rock.angle);
+                    const x = (point.x * c) - (point.y * s);
+                    const y = (point.x * s) + (point.y * c);
+
+                    // Translate point.
+                    rock.canvasPoints[j].x = rock.position.x + x;
+                    rock.canvasPoints[j].y = rock.position.y + y;
+                }
+            }
+        }
+
+        function wrapAround(val, max) {
+            return (max + (val % max)) % max;
+        }
+
+        function renderRocks() {
+            ctx.strokeStyle = '#333';
+            ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+            for (const rock of rocks) {
+                ctx.beginPath();
+                for (const point of rock.canvasPoints) {
+                    // NOTE: It'd be nice if the contents of the canvas could
+                    // scroll with the document but it doesn't seem like that's
+                    // possible without the canvas lagging behind a little,
+                    // which can be unpleasant.
+                    // Alternatively, a canvas as big as the document could be
+                    // created but that could be too resoruce intensive.
+                    ctx.lineTo(point.x, point.y);
+                }
+                ctx.closePath();
+                ctx.stroke();
+            }
+        }
+
+        function loop(timestamp) {
+            if (startTime === undefined) {
+                startTime = currentTime = timestamp;
+            }
+
+            const previousTime = currentTime;
+            currentTime = timestamp;
+            const elapsedTime = (currentTime - previousTime) / 1000;
+
+            updateRocks(elapsedTime);
+            renderRocks();
+
+            window.requestAnimationFrame(loop);
+        }
+    </script>
+</body>

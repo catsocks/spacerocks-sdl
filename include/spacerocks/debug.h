@@ -1,0 +1,17 @@
+#pragma once
+
+#ifndef DEBUG_SPACEROCKS
+#define DEBUG_SPACEROCKS 0
+#endif
+
+#ifndef DEBUG_BOUNDING_BOXES
+#define DEBUG_BOUNDING_BOXES 0
+#endif
+
+#ifndef DEBUG_RENDERED_TEXT_SIZE
+#define DEBUG_RENDERED_TEXT_SIZE 0
+#endif
+
+#ifndef DEBUG_TOUCH_BUTTONS
+#define DEBUG_TOUCH_BUTTONS 0
+#endif

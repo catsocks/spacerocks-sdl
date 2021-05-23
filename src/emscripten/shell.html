@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title translate="no">Spacerocks</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="robots" content="noindex">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <meta property="og:title" content="Spacerocks">
+    <meta property="og:description"
+        content="Spacerocks is a clone of the Asteroids arcade game that you can play in the browser with a keyboard, gamepad and touch.">
+    <meta property="og:image" content="{{url}}/screenshot.png">
+    <meta property="og:url" content="{{url}}">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content="{{url}}/screenshot-2-by-1.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#000000">
+    <link rel="manifest" href="/site.webmanifest">
+    <meta name="msapplication-TileColor" content="#000000">
+    <meta name="theme-color" content="#000000">
+    <style>
+        :root {
+            --loading-spinner-size: clamp(15px, 3vw, 40px);
+            --loading-spinner-thickness: calc(var(--loading-spinner-size) * 0.15);
+            --loading-spinner-fg-color: white;
+            --loading-spinner-bg-color: black;
+
+            --error-icon-size: clamp(25px, 5vw, 35px);
+            --error-icon-fg-color: rgb(255, 255, 255);
+            --error-icon-bg-color: rgb(255, 40, 40);
+        }
+
+        body {
+            background: black;
+        }
+
+        .absolute-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        #loading-spinner {
+            height: var(--loading-spinner-size);
+            width: var(--loading-spinner-size);
+            animation: loading-spinner-rotation 0.8s linear infinite;
+            border-left: var(--loading-spinner-thickness) solid var(--loading-spinner-fg-color);
+            border-right: var(--loading-spinner-thickness) solid var(--loading-spinner-fg-color);
+            border-bottom: var(--loading-spinner-thickness) solid var(--loading-spinner-fg-color);
+            border-top: var(--loading-spinner-thickness) solid var(--loading-spinner-bg-color);
+            border-radius: 100%;
+            background-color: var(--loading-spinner-bg-color);
+        }
+
+        @keyframes loading-spinner-rotation {
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #error {
+            display: flex;
+            min-width: 275px;
+            background: white;
+        }
+
+        #error .message {
+            color: black;
+            font-family: sans-serif;
+            padding: 0 20px;
+        }
+
+        #error-icon-frame {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 70px;
+            background: var(--error-icon-bg-color);
+            padding: 10px;
+        }
+
+        #error-icon {
+            width: var(--error-icon-size);
+            height: var(--error-icon-size);
+            background: linear-gradient(45deg,
+                    transparent 0%,
+                    transparent 43%,
+                    var(--error-icon-fg-color) 45%,
+                    var(--error-icon-fg-color) 55%,
+                    transparent 57%,
+                    transparent 100%),
+                linear-gradient(135deg,
+                    var(--error-icon-bg-color) 0%,
+                    var(--error-icon-bg-color) 43%,
+                    var(--error-icon-fg-color) 45%,
+                    var(--error-icon-fg-color) 55%,
+                    var(--error-icon-bg-color) 57%,
+                    var(--error-icon-bg-color) 100%);
+        }
+
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            /* for no tap highlight */
+            outline: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="absolute-center">
+        <div id="loading-spinner"></div>
+        <div id="error" style="display: none;">
+            <div id="error-icon-frame">
+                <div id="error-icon"></div>
+            </div>
+            <div class="message">
+                <h3>Something went wrong</h3>
+                <p>Please try reloading the page.</p>
+            </div>
+        </div>
+    </div>
+    <canvas id="canvas" oncontextmenu="event.preventDefault()" tabindex="-1"></canvas>
+    <script type="text/javascript">
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/service-worker.js')
+                .catch((err) => {
+                    console.error(err);
+                })
+        }
+
+        const spinnerElement = document.getElementById('loading-spinner');
+        const errorElement = document.getElementById('error');
+
+        const canvas = document.getElementById('canvas');
+        canvas.addEventListener('webglcontextlost', (event) => {
+            // TODO: Figure out a better way to handle a lost context.
+            throw 'WebGL context lost';
+        }, false);
+
+        var Module = {
+            preRun: [],
+            canvas: canvas,
+            setStatus: (text) => {
+                if (!text) {
+                    spinnerElement.style.display = 'none';
+                }
+            },
+        };
+
+        Module.preRun.push(() => {
+            FS.mkdir('/savefolder');
+            FS.mount(IDBFS, {}, '/savefolder');
+            FS.syncfs(true, (err) => {
+                if (err) {
+                    console.error(err);
+                } else {
+                    console.debug('Persistent filesystem initial syncing is done');
+                }
+                Module['removeRunDependency']('syncfs');
+            });
+
+            Module['addRunDependency']('syncfs');
+        });
+
+        window.onerror = () => {
+            // TODO: Only show the error dialog if the game is unplayable.
+            spinnerElement.style.display = 'none';
+            errorElement.style.display = '';
+        };
+
+        // Don't show an installation prompt while the user is playing the game.
+        window.addEventListener('beforeinstallprompt', (event) => {
+            event.preventDefault();
+        });
+    </script>
+    {{{ SCRIPT }}}
+</body>

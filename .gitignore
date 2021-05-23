@@ -1,0 +1,16 @@
+build
+
+.idea
+.vscode
+.netlify
+
+# Sublime Text
+*.sublime-*
+
+# Qt Creator
+CMakeLists.txt.user
+
+# Sourcetrail 
+*.srctrl*
+
+node_modules

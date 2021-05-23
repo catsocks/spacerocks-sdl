@@ -1,0 +1,3 @@
+[submodule "cmake"]
+	path = cmake
+	url = https://gitlab.com/aminosbh/sdl2-cmake-modules.git
