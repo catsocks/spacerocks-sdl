@@ -41,18 +41,13 @@ find_program(NODE node nodejs)
 # Sometimes it is not necessary to link libm, when using MSVC for example.
 check_library_exists(m pow "" HAVE_LIBM)
 
-# When using Emscripten, SDL2 will be installed during compilation and OpenAL 
-# just has to be linked.
-if(NOT EMSCRIPTEN)
-  find_package(SDL2 REQUIRED)
-  find_package(OpenAL REQUIRED)
-endif()
-
-# PhysFS isn't in the Emscripten Ports collection so it cannot be installed
-# during compilation by emcc.
 # You may want to pass -DCMAKE_PREFIX_PATH="/local" to CMake when configuring if
-# you've installed PhysicsFS to the Emscripten system/local or MinGW
-# sys-root/mingw/local folder.
+# you've installed some of these libraries to the Emscripten system/local or
+# MinGW sys-root/mingw/local folder.
+# You do not need to install OpenAL when using Emscripten because Emscripten
+# comes with its own OpenAL port.
+find_package(SDL2 REQUIRED)
+find_package(OpenAL REQUIRED)
 find_package(PhysFS REQUIRED)
 
 set(SOURCES
@@ -99,13 +94,9 @@ if(EMSCRIPTEN)
             -Wno-gnu-zero-variadic-macro-arguments
             -Wno-dollar-in-identifier-extension)
 
-  set(USE_FLAGS -sUSE_SDL=2)
-  target_compile_options(spacerocks_lib PUBLIC ${USE_FLAGS})
   # The IDBFS library is necessary for writing persistent files in the browser.
-  target_link_options(spacerocks_lib PUBLIC ${USE_FLAGS} -lidbfs.js -lopenal)
+  target_link_options(spacerocks_lib PUBLIC -lidbfs.js)
 else()
-  target_link_libraries(spacerocks_lib PUBLIC SDL2::Main ${OPENAL_LIBRARY})
-
   if(HAVE_LIBM)
     target_link_libraries(spacerocks_lib PRIVATE m)
   endif()
@@ -119,7 +110,8 @@ target_compile_options(spacerocks_lib PRIVATE
 target_compile_options(spacerocks_lib PUBLIC
   $<$<OR:$<CONFIG:Debug>,$<BOOL:${SR_DEBUG}>>:-DDEBUG_SPACEROCKS>)
 
-target_link_libraries(spacerocks_lib PUBLIC ${PHYSFS_LIBRARY})
+target_link_libraries(spacerocks_lib PUBLIC SDL2::Main ${OPENAL_LIBRARY}
+  ${PHYSFS_LIBRARY})
 
 # TODO: Figure out why adding the PhysicsFS include folder is needed for
 # physfs.h to be found from within the source files when cross-compiling with
