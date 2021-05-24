@@ -23,7 +23,7 @@ const char *const langs_strings[NUM_LANGUAGES][NUM_STRINGS] = {
             [STRING_ENTER_INITIALS] =
                 "SUA PONTUAÇÃO É UMA DAS DEZ MELHORES\n"
                 "POR FAVOR INSIRA SUAS INICIAIS\n"
-                "PRESSIONE GIRAR PARA SELECIONAR A LETRA\n"
+                "APERTE GIRAR PARA SELECIONAR A LETRA\n"
                 "APERTE HYPERSPACE PARA CONFIRMAR A LETRA",
             [STRING_GAME_OVER] = "FIM DE JOGO",
             [STRING_HIGHSCORES] = "PONTUAÇÕES ALTAS",
