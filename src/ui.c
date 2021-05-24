@@ -76,6 +76,7 @@ static void init_ui_localized_texts(UI *ui) {
         make_ui_text(21, langs_strings[ui->game_state.lang][STRING_COIN_PLAY]);
     ui->texts[UI_TEXT_PUSH_START] =
         make_ui_text(21, langs_strings[ui->game_state.lang][STRING_PUSH_START]);
+    ui->texts[UI_TEXT_PUSH_START].color.a = 0;
     ui->texts[UI_TEXT_GAME_OVER] =
         make_ui_text(21, langs_strings[ui->game_state.lang][STRING_GAME_OVER]);
     ui->texts[UI_TEXT_ENTER_INITIALS] = make_ui_text(
@@ -100,7 +101,6 @@ void set_ui_localized_texts(UI *ui) {
     text->size = get_rendered_text_size(text->height, text->str);
     text->position.x = (ui->size.x - text->size.x) / 2.0f;
     text->position.y = 80.0f;
-    text->color.a = 0;
 
     text = &ui->texts[UI_TEXT_GAME_OVER];
     text->str = langs_strings[ui->game_state.lang][STRING_GAME_OVER];
