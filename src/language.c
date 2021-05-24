@@ -10,7 +10,8 @@ const char *const langs_strings[NUM_LANGUAGES][NUM_STRINGS] = {
             [STRING_ENTER_INITIALS] = "YOUR SCORE IS ONE OF THE TEN BEST\n"
                                       "PLEASE ENTER YOUR INITIALS\n"
                                       "PUSH ROTATE TO SELECT LETTER\n"
-                                      "PUSH HYPERSPACE WHEN LETTER IS CORRECT",
+                                      "PUSH HYPERSPACE WHEN LETTER IS CORRECT\n"
+                                      "PUSH FIRE TO SKIP THIS STEP",
             [STRING_GAME_OVER] = "GAME OVER",
             [STRING_HIGHSCORES] = "HIGH SCORES",
             [STRING_LANGUAGE] = "ENGLISH",
@@ -24,7 +25,8 @@ const char *const langs_strings[NUM_LANGUAGES][NUM_STRINGS] = {
                 "SUA PONTUAÇÃO É UMA DAS DEZ MELHORES\n"
                 "POR FAVOR INSIRA SUAS INICIAIS\n"
                 "APERTE GIRAR PARA SELECIONAR A LETRA\n"
-                "APERTE HYPERSPACE PARA CONFIRMAR A LETRA",
+                "APERTE HYPERSPACE PARA CONFIRMAR A LETRA\n"
+                "APERTE FOGO PARA PULAR ESTA ETAPA\n",
             [STRING_GAME_OVER] = "FIM DE JOGO",
             [STRING_HIGHSCORES] = "PONTUAÇÕES ALTAS",
             [STRING_LANGUAGE] = "PORTUGUÊS",

@@ -31,6 +31,8 @@ static void check_initials_input(Game *game);
 static void start_scoreboard_attraction(Game *game);
 static void cycle_through_initials_chars(InitialsInput *input, int step);
 static void submit_initials_char(InitialsInput *input);
+static void set_player_done_entering_initials(InitialsInput *input);
+static void skip_initials_input(InitialsInput *input);
 static void check_attraction_change_time(Game *game);
 static void check_play_time(Game *game);
 static void enable_play_state_touch_buttons(TouchInput *input);
@@ -434,6 +436,9 @@ static void check_initials_input(Game *game) {
     } else if (controller_button_down_not_held(&game->input, BUTTON_HYPERSPACE,
                                                ctrl)) {
         submit_initials_char(&game->initials_input);
+    } else if (controller_button_down_not_held(&game->input, BUTTON_FIRE,
+                                               ctrl)) {
+        skip_initials_input(&game->initials_input);
     }
 }
 
@@ -469,14 +474,25 @@ static void cycle_through_initials_chars(InitialsInput *input, int step) {
 
 static void submit_initials_char(InitialsInput *input) {
     if (input->cursor == NUM_INITIALS - 1) {
-        input->cursor = 0;
-        input->chars_idx = 0;
-        input->player_done = true;
+        set_player_done_entering_initials(input);
         return;
     }
     input->cursor++;
     input->chars_idx = 0;
     input->initials[input->cursor] = valid_initials_chars[input->chars_idx];
+}
+
+static void set_player_done_entering_initials(InitialsInput *input) {
+    input->cursor = 0;
+    input->chars_idx = 0;
+    input->player_done = true;
+}
+
+static void skip_initials_input(InitialsInput *input) {
+    for (int i = 0; i < NUM_INITIALS; i++) {
+        input->initials[i] = ' ';
+    }
+    set_player_done_entering_initials(input);
 }
 
 void update_game(Game *game) {
@@ -645,6 +661,7 @@ static void enable_initials_input_touch_buttons(TouchInput *input) {
     disable_touch_input_buttons(input);
     input->buttons[BUTTON_ROTATE_LEFT].enabled = true;
     input->buttons[BUTTON_ROTATE_RIGHT].enabled = true;
+    input->buttons[BUTTON_FIRE].enabled = true;
     input->buttons[BUTTON_HYPERSPACE].enabled = true;
 }
 
