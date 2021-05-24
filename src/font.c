@@ -953,6 +953,11 @@ static size_t get_glyph_char_from_str(const char *str, GlyphChar *ch) {
 // Return the space that the given string will take when rendered by
 // render_text (excluding diacritics).
 Vec2Df get_rendered_text_size(float height, const char *str) {
+    SDL_assert(str != NULL);
+    if (str == NULL) {
+        return (Vec2Df){0};
+    }
+
     Vec2Df size = {0.0f, height + 1.0f};
     float line_width = 0.0f;
     size_t str_len = strlen(str);
