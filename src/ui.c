@@ -72,19 +72,13 @@ static UIText make_ui_text(float height, const char *str) {
 }
 
 static void init_ui_localized_texts(UI *ui) {
-    ui->texts[UI_TEXT_COIN_PLAY] =
-        make_ui_text(21, langs_strings[ui->game_state.lang][STRING_COIN_PLAY]);
-    ui->texts[UI_TEXT_PUSH_START] =
-        make_ui_text(21, langs_strings[ui->game_state.lang][STRING_PUSH_START]);
+    ui->texts[UI_TEXT_COIN_PLAY] = make_ui_text(21, NULL);
+    ui->texts[UI_TEXT_PUSH_START] = make_ui_text(21, NULL);
     ui->texts[UI_TEXT_PUSH_START].color.a = 0;
-    ui->texts[UI_TEXT_GAME_OVER] =
-        make_ui_text(21, langs_strings[ui->game_state.lang][STRING_GAME_OVER]);
-    ui->texts[UI_TEXT_ENTER_INITIALS] = make_ui_text(
-        21, langs_strings[ui->game_state.lang][STRING_ENTER_INITIALS]);
-    ui->texts[UI_TEXT_HIGHSCORES] =
-        make_ui_text(21, langs_strings[ui->game_state.lang][STRING_HIGHSCORES]);
-    ui->texts[UI_TEXT_LANGUAGE] =
-        make_ui_text(12, langs_strings[ui->game_state.lang][STRING_LANGUAGE]);
+    ui->texts[UI_TEXT_GAME_OVER] = make_ui_text(21, NULL);
+    ui->texts[UI_TEXT_ENTER_INITIALS] = make_ui_text(21, NULL);
+    ui->texts[UI_TEXT_HIGHSCORES] = make_ui_text(21, NULL);
+    ui->texts[UI_TEXT_LANGUAGE] = make_ui_text(12, NULL);
 
     set_ui_localized_texts(ui);
 }
