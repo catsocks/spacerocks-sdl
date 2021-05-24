@@ -71,7 +71,7 @@ The button names of a Xbox 360 controller are used.
 * *_Left shoulder_* starts a 1 player game
 * *_Right shoulder_* starts a 2 player game
 * *_D-pad left_* rotates the ship left
-* *_D-pad right_* rotate the ship right
+* *_D-pad right_* rotates the ship right
 * *_D-pad up_* thrusts the ship forward
 * *_A_* fires a missile
 * *_B_* sends the ship into hyperspace
