@@ -24,6 +24,7 @@ self.addEventListener('install', (event) => {
           './buttons/virtual-rotate-right-button.svg',
           './buttons/virtual-2p-button.svg',
           './buttons/virtual-hyperspace-button.svg',
+          './game.data',
           './game.html',
           './game.js',
           './game.wasm',
