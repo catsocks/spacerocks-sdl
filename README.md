@@ -1,7 +1,7 @@
 # Spacerocks
 
 An [Asteroids](https://en.wikipedia.org/wiki/Asteroids_%28video_game%29)
-arcade game clone made with the [SDL](https://www.libsdl.org/) cross-platform
+arcade game clone made with the [SDL](https://www.libsdl.org) cross-platform
 multimedia library for Windows, macOS, Linux and the browser.
 
 You can play the game in your browser [here](https://catsocks.github.io/spacerocks-sdl)
@@ -83,7 +83,7 @@ The button names of a Xbox 360 controller are used.
 #### Programs
 
 * C compiler with C99 support
-* [CMake](https://cmake.org/)
+* [CMake](https://cmake.org)
 * Node.js (optional, used for building the website and the manual)
 
 Before using the Node.js scripts make sure to install their dependencies using
@@ -94,7 +94,7 @@ project.
 
 * [SDL](https://github.com/libsdl-org/SDL) >= 2.0.13
 * OpenAL (preferably [OpenAL Soft](https://github.com/kcat/openal-soft)) >= 1.1 (guess)
-* [PhysicsFS](https://www.icculus.org/physfs/) >= 3.0.0 (guess)
+* [PhysicsFS](https://www.icculus.org/physfs) >= 3.0.0 (guess)
 
 ### Native executable
 
@@ -109,8 +109,8 @@ The command will configure a debug build to a folder named build.
 
 If you wouldn't like to build the tests pass `-DBUILD_TESTING=off` and if you
 encounter any issues with missing libraries, passing
-`-DCMAKE_FIND_DEBUG_MODE=on` will make CMake print where it expects to find
-the library files.
+`-DCMAKE_FIND_DEBUG_MODE=on` will make CMake print the paths where it expects to
+find the library files.
 
 With a successfully configured build, you can build it as follows:
 
@@ -190,7 +190,8 @@ does not package the game assets with compression by default as of 2021-05-04.
 ## Bugs
 
 * The ship thrust sound is disabled in the browser because of audio crackling
-with the Emscripten OpenAL implementation
+when the Emscripten OpenAL implementation is used
+* The graphics lines can become too thin on very high resolution screens
 
 ## License
 
