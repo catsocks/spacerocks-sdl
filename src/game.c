@@ -1035,7 +1035,8 @@ static double get_pulse_silence_duration(uint32_t time_since_pulse_start) {
 static void set_pulse_silence_buffer(ALuint buffer, double t) {
     // The type of the samples is determined by AUDIO_FORMAT.
     static int16_t samples[AUDIO_FREQUENCY];
-    int sample_count = MIN(t * AUDIO_FREQUENCY, ARRAY_SIZE(samples));
+    int sample_count =
+        MIN((unsigned)(t * AUDIO_FREQUENCY), ARRAY_SIZE(samples));
     int num_bytes = sample_count * sizeof(int16_t);
     alBufferData(buffer, AUDIO_FORMAT, samples, num_bytes, AUDIO_FREQUENCY);
 }
