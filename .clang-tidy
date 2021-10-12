@@ -1,0 +1,28 @@
+# cert-msc30-c, cert-msc50-cpp, cert-msc32-c, cert-msc51-cpp are disabled
+# because weak random numbers are not a problem in this project.
+# readability-else-after-return is disabled because of noise produced by
+# SDL_assert usage.
+
+Checks: '-*,
+misc-*,
+bugprone-*,
+clang-analyzer-*,
+cert-*,
+portability-*,
+performance-*,
+readability-*,
+-bugprone-narrowing-conversions,
+-clang-analyzer-security.insecureAPI.strcpy,
+-cert-msc30-c,
+-cert-msc32-c,
+-cert-msc50-cpp,
+-cert-msc51-cpp,
+-readability-uppercase-literal-suffix,
+-readability-magic-numbers,
+-readability-else-after-return'
+
+CheckOptions:
+# The threshold could probably be lowered if the warning below was supressed in
+# functions that use SDL_assert many times.
+  - key:   readability-function-cognitive-complexity.Threshold
+    value: '70'
