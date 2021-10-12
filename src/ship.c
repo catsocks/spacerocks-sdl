@@ -188,7 +188,7 @@ void update_ship(Ship *ship, double t, double dt) {
 }
 
 void play_ship_thrusting_sound(Ship *ship, Audio *audio) {
-    // TODO: Remove this this macro when it's possible to tweak the source's
+    // TODO: Remove this macro when it's possible to tweak the source's
     // gain without causing crackling with the Emscripten OpenAL implementation.
 #ifdef __EMSCRIPTEN__
     (void)ship;

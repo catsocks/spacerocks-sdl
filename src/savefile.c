@@ -91,8 +91,8 @@ done:
                      PHYSFS_getErrorByCode(PHYSFS_getLastErrorCode()));
     }
 
-    // NOTE: It's not guaranteed that the filesystem will be synced before the
-    // browser tab is closed.
+    // NOTE: FS.syncfs may not finish syncing the filesystem before the browser
+    // tab is closed.
 #ifdef __EMSCRIPTEN__
     if (ok) {
         // clang-format off

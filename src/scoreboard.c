@@ -11,7 +11,7 @@ bool is_high_score(Scoreboard *board, int score) {
     return get_score_index(board, score) >= 0;
 }
 
-// Return the index where the given score would be placed in the scoreboard and
+// Return the index where the given score would be placed in the scoreboard or
 // -1 if it's too low to be included in it.
 static int get_score_index(Scoreboard *board, int score) {
     for (int i = 0; i < MAX_SCORES; i++) {
