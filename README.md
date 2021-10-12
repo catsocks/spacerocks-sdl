@@ -98,8 +98,8 @@ project.
 
 ### Native executable
 
-The game's executable can be built by first configuring a build using CMake
-from the root folder of the project:
+The executable can be built by first configuring a build using CMake from the
+root folder of the project:
 
 ```sh
 $ cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
@@ -145,16 +145,15 @@ $ cmake --build build --target spacerocks_manual
 
 Emscripten is used to create an executable that can be run in the browser.
 
-All the libraries listed in the requirements are used, but you will only have to
-install the PhysicsFS library, because as of 2021-05-21 PhysicFS is not present
-in the
+The only library you will have to install is PhysicsFS, because SDL will be
+automatically installed during compilation using
 [Emscripten Ports](https://emscripten.org/docs/compiling/Building-Projects.html#emscripten-ports)
-collection which SDL2 will be installed from during compilation. OpenAL comes
-with Emscripten so it only has to be linked.
+, and the OpenAL library that comes with Emscripten will be used.
+Unfortunately as of 2021-05-21 PhysicsFS is not included in Emscripten Ports.
 
-A build is configured the same way a native build is, except the emcmake tool
-should be used to call CMake, it will let CMake know how to cross-compile the
-project:
+The build is configured the same way a native one is, except that the emcmake
+tool should be used to call CMake, as it will let CMake know how to
+cross-compile the project:
 
 ```sh
 $ emcmake cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
@@ -162,7 +161,7 @@ $ emcmake cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
 
 Build the same way you would a native executable, and with a
 successful build you can run the executable using the emrun tool which will
-serve it in a web server and open the server in your default browser:
+serve it in a web server and open it in your default browser:
 
 ```sh
 $ emrun --serve_root build build/game.html
