@@ -9,7 +9,7 @@
 // Two issues as of SDL v2.0.13 prevent SDL_RenderSetLogicalSize from being used
 // in the place of RendererWrapper:
 //     1) SDL_RenderSetLogicalSize causes the game to be scaled incorrectly when
-//        fullscreen is toggled with Emscripten.
+//        fullscreen is toggled when using Emscripten.
 //     2) Diagonal lines appear thinner than straight lines when scaling is
 //        applied.
 struct RendererWrapper {

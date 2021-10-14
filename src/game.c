@@ -177,14 +177,14 @@ static void update_ui_game_state(Game *game, UIGameState *state) {
 }
 
 // NOTE: Necessary so the SDL_WINDOWEVENT_SHOWN and SDL_WINDOWEVENT_HIDDEN
-// events may be handled when running with Emscripten.
+// events may be handled when running when using Emscripten.
 static int game_event_watch(void *user_data, SDL_Event *event) {
     Game *game = user_data;
 
     if (event->type == SDL_WINDOWEVENT) {
-        // SDL_WINDOWEVENT_SHOWN and SDL_WINDOWEVENT_HIDDEN will be generated
-        // when the user switches from and to the browser tab which the game may
-        // running in.
+        // SDL_WINDOWEVENT_SHOWN and SDL_WINDOWEVENT_HIDDEN will be added to the
+        // event queue when the user switches to and from the browser in which
+        // the game is running, respectively.
         switch (event->window.event) {
         case SDL_WINDOWEVENT_RESTORED:
         case SDL_WINDOWEVENT_SHOWN:
