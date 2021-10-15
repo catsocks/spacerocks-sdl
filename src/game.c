@@ -274,7 +274,7 @@ void check_game_input(Game *game) {
 
     check_initials_input(game);
 
-    update_input(&game->input);
+    update_input_buttons_state(&game->input);
 }
 
 static void start_game_with_player(Game *game, bool two_players) {

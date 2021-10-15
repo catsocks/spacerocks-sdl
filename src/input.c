@@ -67,40 +67,41 @@ static TouchButton make_touch_button(int x, int y, float width) {
     };
 }
 
-void input_down_to_held(Input *input) {
+// Should be called at the end of every game frame.
+void update_input_buttons_state(Input *input) {
+    // Change buttons in the state BUTTON_STATE_JUST_PRESSED to
+    // BUTTON_STATE_PRESSED.
     for (int b = 0; b < NUM_BUTTONS; b++) {
-        if (input->keyboard_state[b] == BUTTON_STATE_DOWN) {
-            input->keyboard_state[b] = BUTTON_STATE_HELD;
+        if (input->keyboard_state[b] == BUTTON_STATE_JUST_PRESSED) {
+            input->keyboard_state[b] = BUTTON_STATE_PRESSED;
         }
 
         for (int c = 0; c < NUM_CONTROLLERS; c++) {
-            if (input->controller.buttons[c][b] == BUTTON_STATE_DOWN) {
-                input->controller.buttons[c][b] = BUTTON_STATE_HELD;
+            if (input->controller.buttons[c][b] == BUTTON_STATE_JUST_PRESSED) {
+                input->controller.buttons[c][b] = BUTTON_STATE_PRESSED;
             }
         }
 
-        if (input->touch.buttons[b].state == BUTTON_STATE_DOWN) {
-            input->touch.buttons[b].state = BUTTON_STATE_HELD;
+        if (input->touch.buttons[b].state == BUTTON_STATE_JUST_PRESSED) {
+            input->touch.buttons[b].state = BUTTON_STATE_PRESSED;
         }
     }
-}
 
-// NOTE: Maybe have a function that calls both input_down_to_held and
-// input_released_to_up?
-void input_released_to_up(Input *input) {
+    // Change buttons in the state BUTTON_STATE_JUST_RELEASED to
+    // BUTTON_STATE_RELEASED.
     for (int b = 0; b < NUM_BUTTONS; b++) {
-        if (input->keyboard_state[b] == BUTTON_STATE_PRESSED) {
-            input->keyboard_state[b] = BUTTON_STATE_UP;
+        if (input->keyboard_state[b] == BUTTON_STATE_JUST_RELEASED) {
+            input->keyboard_state[b] = BUTTON_STATE_RELEASED;
         }
 
         for (int c = 0; c < NUM_CONTROLLERS; c++) {
-            if (input->controller.buttons[c][b] == BUTTON_STATE_PRESSED) {
-                input->controller.buttons[c][b] = BUTTON_STATE_UP;
+            if (input->controller.buttons[c][b] == BUTTON_STATE_JUST_RELEASED) {
+                input->controller.buttons[c][b] = BUTTON_STATE_RELEASED;
             }
         }
 
-        if (input->touch.buttons[b].state == BUTTON_STATE_PRESSED) {
-            input->touch.buttons[b].state = BUTTON_STATE_UP;
+        if (input->touch.buttons[b].state == BUTTON_STATE_JUST_RELEASED) {
+            input->touch.buttons[b].state = BUTTON_STATE_RELEASED;
         }
     }
 }

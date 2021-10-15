@@ -82,8 +82,7 @@ struct Input {
 typedef struct Input Input;
 
 Input make_input();
-void input_down_to_held(Input *input);
-void input_released_to_up(Input *input);
+void update_input_buttons_state(Input *input);
 void input_check_keyboard_event(Input *input, SDL_Event *event);
 void input_check_finger_event(Input *input, Vec2D logical_size,
                               SDL_Event *event);
