@@ -317,7 +317,7 @@ static UITouchButton update_ui_touch_button(UITouchButton touch_button,
         return touch_button;
     }
 
-    if (input->buttons[touch_button.button].state != BUTTON_STATE_UP &&
+    if (input->buttons[touch_button.button].state != BUTTON_STATE_RELEASED &&
         trans.done) {
         SDL_SetTextureAlphaMod(touch_button.texture,
                                fminf(touch_button.transparency + 0.2f, 1.0f) *

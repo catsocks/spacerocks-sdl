@@ -225,47 +225,47 @@ void check_controller_button_event(Game *game, SDL_Event *event) {
 }
 
 void check_game_input(Game *game) {
-    if (button_pressed_not_down(&game->input, BUTTON_COIN)) {
+    if (is_button_just_released(&game->input, BUTTON_COIN)) {
         if (game->coins < MAX_COINS) {
             game->coins++;
         }
     }
 
-    if (button_pressed_not_down(&game->input, BUTTON_ONE_PLAYER)) {
+    if (is_button_just_released(&game->input, BUTTON_ONE_PLAYER)) {
         if (game->coins >= ONE_PLAYER_GAME_COINS) {
             start_game_with_player(game, false);
             game->coins -= ONE_PLAYER_GAME_COINS;
         }
     }
 
-    if (button_pressed_not_down(&game->input, BUTTON_TWO_PLAYERS)) {
+    if (is_button_just_released(&game->input, BUTTON_TWO_PLAYERS)) {
         if (game->coins >= TWO_PLAYER_GAME_COINS) {
             start_game_with_player(game, true);
             game->coins -= TWO_PLAYER_GAME_COINS;
         }
     }
 
-    if (button_down_not_held(&game->input, BUTTON_TOGGLE_FULLSCREEN)) {
+    if (is_button_just_pressed(&game->input, BUTTON_TOGGLE_FULLSCREEN)) {
         toggle_fullscreen(game);
     }
 
-    if (button_down_not_held(&game->input, BUTTON_ENABLE_FULLSCREEN)) {
+    if (is_button_just_pressed(&game->input, BUTTON_ENABLE_FULLSCREEN)) {
         enable_fullscreen(game);
     }
 
-    if (button_down_not_held(&game->input, BUTTON_DISABLE_FULLSCREEN)) {
+    if (is_button_just_pressed(&game->input, BUTTON_DISABLE_FULLSCREEN)) {
         disable_fullscreen(game);
     }
 
-    if (button_down_not_held(&game->input, BUTTON_TOGGLE_MUTE)) {
+    if (is_button_just_pressed(&game->input, BUTTON_TOGGLE_MUTE)) {
         toggle_audio_muted(game);
     }
 
-    if (button_down_not_held(&game->input, BUTTON_NEXT_LANG)) {
+    if (is_button_just_pressed(&game->input, BUTTON_NEXT_LANG)) {
         cycle_through_languages(game, 1);
     }
 
-    if (button_down_not_held(&game->input, BUTTON_PREV_LANG)) {
+    if (is_button_just_pressed(&game->input, BUTTON_PREV_LANG)) {
         cycle_through_languages(game, -1);
     }
 
@@ -274,8 +274,7 @@ void check_game_input(Game *game) {
 
     check_initials_input(game);
 
-    input_down_to_held(&game->input);
-    input_released_to_up(&game->input);
+    update_input(&game->input);
 }
 
 static void start_game_with_player(Game *game, bool two_players) {
@@ -388,29 +387,29 @@ static void cycle_through_languages(Game *game, int step) {
 
 static void check_player_game_input(PlayerGame *game, Input *input) {
     if (DEBUG_SPACEROCKS) {
-        if (button_down_not_held(input, BUTTON_ADD_SHIP)) {
+        if (is_button_just_pressed(input, BUTTON_ADD_SHIP)) {
             game->ships_remaining++;
         }
 
-        if (button_down_not_held(input, BUTTON_ADD_SCORE)) {
+        if (is_button_just_pressed(input, BUTTON_ADD_SCORE)) {
             game->score += 5000;
         }
 
-        if (button_down_not_held(input, BUTTON_DESTROY_SHIP)) {
+        if (is_button_just_pressed(input, BUTTON_DESTROY_SHIP)) {
             destroy_ship(game);
         }
 
-        if (button_down_not_held(input, BUTTON_DESTROY_ROCKS)) {
+        if (is_button_just_pressed(input, BUTTON_DESTROY_ROCKS)) {
             for (int i = 0; i < MAX_ROCKS; i++) {
                 destroy_and_split_rock(game, &game->rocks[i], true);
             }
         }
 
-        if (button_down_not_held(input, BUTTON_DESTROY_SAUCER)) {
+        if (is_button_just_pressed(input, BUTTON_DESTROY_SAUCER)) {
             destroy_saucer(game, true);
         }
 
-        if (button_down_not_held(input, BUTTON_GAME_OVER)) {
+        if (is_button_just_pressed(input, BUTTON_GAME_OVER)) {
             if (game->ship.spawned) {
                 game->ships_remaining = 0;
                 destroy_ship(game);
@@ -427,17 +426,17 @@ static void check_initials_input(Game *game) {
     }
 
     Controller ctrl = game->players_game[game->current_player].controller;
-    if (controller_button_down_not_held(&game->input, BUTTON_ROTATE_LEFT,
-                                        ctrl)) {
+    if (is_button_just_pressed_controller(&game->input, BUTTON_ROTATE_LEFT,
+                                          ctrl)) {
         cycle_through_initials_chars(&game->initials_input, -1);
-    } else if (controller_button_down_not_held(&game->input,
-                                               BUTTON_ROTATE_RIGHT, ctrl)) {
+    } else if (is_button_just_pressed_controller(&game->input,
+                                                 BUTTON_ROTATE_RIGHT, ctrl)) {
         cycle_through_initials_chars(&game->initials_input, 1);
-    } else if (controller_button_down_not_held(&game->input, BUTTON_HYPERSPACE,
-                                               ctrl)) {
+    } else if (is_button_just_pressed_controller(&game->input,
+                                                 BUTTON_HYPERSPACE, ctrl)) {
         submit_initials_char(&game->initials_input);
-    } else if (controller_button_down_not_held(&game->input, BUTTON_FIRE,
-                                               ctrl)) {
+    } else if (is_button_just_pressed_controller(&game->input, BUTTON_FIRE,
+                                                 ctrl)) {
         skip_initials_input(&game->initials_input);
     }
 }

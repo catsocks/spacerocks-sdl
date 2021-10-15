@@ -93,7 +93,7 @@ void check_ship_input(Ship *ship, Input *input, Controller ctrl, double t) {
 
     ship->physics.linear_accel = (Vec2Df){0};
     float linear_speed = 500.0f;
-    if (controller_button_down(input, BUTTON_THRUST, ctrl)) {
+    if (is_button_pressed_controller(input, BUTTON_THRUST, ctrl)) {
         ship->thrusting = true;
         ship->physics.linear_accel.x = cosf(ship->physics.angle) * linear_speed;
         ship->physics.linear_accel.y = sinf(ship->physics.angle) * linear_speed;
@@ -101,19 +101,19 @@ void check_ship_input(Ship *ship, Input *input, Controller ctrl, double t) {
 
     ship->physics.angular_accel = 0.0f;
     float angular_speed = pi * 10.0f;
-    if (controller_button_down(input, BUTTON_ROTATE_LEFT, ctrl)) {
+    if (is_button_pressed_controller(input, BUTTON_ROTATE_LEFT, ctrl)) {
         ship->physics.angular_accel = -angular_speed;
-    } else if (controller_button_down(input, BUTTON_ROTATE_RIGHT, ctrl)) {
+    } else if (is_button_pressed_controller(input, BUTTON_ROTATE_RIGHT, ctrl)) {
         ship->physics.angular_accel = angular_speed;
     }
 
-    if (controller_button_down(input, BUTTON_FIRE, ctrl)) {
+    if (is_button_pressed_controller(input, BUTTON_FIRE, ctrl)) {
         if (!ship->hyperspace_enabled) {
             ship->firing = true;
         }
     }
 
-    if (controller_button_down_not_held(input, BUTTON_HYPERSPACE, ctrl)) {
+    if (is_button_just_pressed_controller(input, BUTTON_HYPERSPACE, ctrl)) {
         enable_hyperspace(ship, t);
     }
 }

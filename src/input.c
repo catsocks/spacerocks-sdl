@@ -111,13 +111,13 @@ void input_check_keyboard_event(Input *input, SDL_Event *event) {
         return;
     }
     if (event->type == SDL_KEYDOWN) {
-        // Prevent switching a button from BUTTON_STATE_HELD to
-        // BUTTON_STATE_DOWN on repeated SDL_KEYDOWN events.
-        if (input->keyboard_state[b] != BUTTON_STATE_HELD) {
-            input->keyboard_state[b] = BUTTON_STATE_DOWN;
+        // Prevent switching a button from BUTTON_STATE_PRESSED to
+        // BUTTON_STATE_JUST_PRESSED on repeated SDL_KEYDOWN events.
+        if (input->keyboard_state[b] != BUTTON_STATE_PRESSED) {
+            input->keyboard_state[b] = BUTTON_STATE_JUST_PRESSED;
         }
     } else {
-        input->keyboard_state[b] = BUTTON_STATE_PRESSED;
+        input->keyboard_state[b] = BUTTON_STATE_JUST_RELEASED;
     }
 }
 
@@ -158,9 +158,9 @@ void input_check_controller_button_event(Input *input, SDL_Event *event) {
         return;
     }
     if (event->cbutton.state == SDL_PRESSED) {
-        input->controller.buttons[c][b] = BUTTON_STATE_DOWN;
+        input->controller.buttons[c][b] = BUTTON_STATE_JUST_PRESSED;
     } else {
-        input->controller.buttons[c][b] = BUTTON_STATE_PRESSED;
+        input->controller.buttons[c][b] = BUTTON_STATE_JUST_RELEASED;
     }
 }
 
@@ -171,7 +171,7 @@ void input_check_finger_event(Input *input, Vec2D logical_size,
                    event->tfinger.y * logical_size.y};
     for (int i = 0; i < NUM_BUTTONS; i++) {
         if (!input->touch.buttons[i].enabled) {
-            input->touch.buttons[i].state = BUTTON_STATE_PRESSED;
+            input->touch.buttons[i].state = BUTTON_STATE_JUST_RELEASED;
             continue;
         }
 
@@ -179,7 +179,7 @@ void input_check_finger_event(Input *input, Vec2D logical_size,
             if (input->touch.buttons[i].finger_id != event->tfinger.fingerId) {
                 continue;
             }
-            input->touch.buttons[i].state = BUTTON_STATE_PRESSED;
+            input->touch.buttons[i].state = BUTTON_STATE_JUST_RELEASED;
             input->touch.buttons[i].finger_id = -1;
             continue;
         }
@@ -187,82 +187,85 @@ void input_check_finger_event(Input *input, Vec2D logical_size,
         if (SDL_PointInRect(&point, &input->touch.buttons[i].rect)) {
             if (event->type == SDL_FINGERDOWN) {
                 input->touch.buttons[i].finger_id = event->tfinger.fingerId;
-                input->touch.buttons[i].state = BUTTON_STATE_DOWN;
+                input->touch.buttons[i].state = BUTTON_STATE_JUST_PRESSED;
             }
         } else {
             if (input->touch.buttons[i].finger_id != event->tfinger.fingerId) {
                 continue;
             }
-            input->touch.buttons[i].state = BUTTON_STATE_UP;
+            input->touch.buttons[i].state = BUTTON_STATE_RELEASED;
             input->touch.buttons[i].finger_id = -1;
         }
     }
 
     // Then check the touch gestures, which are limited to the states
-    // BUTTON_STATE_DOWN and BUTTON_STATE_UP.
+    // BUTTON_STATE_JUST_PRESSED and BUTTON_STATE_RELEASED.
     if (event->type != SDL_FINGERUP) {
         if (event->tfinger.dy > 0.1f) {
             input->touch.buttons[BUTTON_DISABLE_FULLSCREEN].state =
-                BUTTON_STATE_DOWN;
+                BUTTON_STATE_JUST_PRESSED;
         } else if (event->tfinger.dy < -0.1f) {
             input->touch.buttons[BUTTON_ENABLE_FULLSCREEN].state =
-                BUTTON_STATE_DOWN;
+                BUTTON_STATE_JUST_PRESSED;
         }
     } else {
-        input->touch.buttons[BUTTON_ENABLE_FULLSCREEN].state = BUTTON_STATE_UP;
-        input->touch.buttons[BUTTON_DISABLE_FULLSCREEN].state = BUTTON_STATE_UP;
+        input->touch.buttons[BUTTON_ENABLE_FULLSCREEN].state =
+            BUTTON_STATE_RELEASED;
+        input->touch.buttons[BUTTON_DISABLE_FULLSCREEN].state =
+            BUTTON_STATE_RELEASED;
     }
 }
 
-// Return true if the given button is down but has not been held, meaning that
-// its state is BUTTON_STATE_DOWN.
-bool button_down_not_held(Input *input, Button button) {
-    return input->keyboard_state[button] == BUTTON_STATE_DOWN ||
-           input->controller.buttons[CONTROLLER_1][button] ==
-               BUTTON_STATE_DOWN ||
-           input->controller.buttons[CONTROLLER_2][button] ==
-               BUTTON_STATE_DOWN ||
-           input->touch.buttons[button].state == BUTTON_STATE_DOWN;
-}
-
-// Return true if the given button is down.
-// NOTE: There are too many if statements here.
-bool controller_button_down(Input *input, Button button,
-                            Controller preferred_ctrl) {
+// Return true if the given button is pressed.
+// NOTE: There are too many if statements here, what's a better way to do this?
+bool is_button_pressed_controller(Input *input, Button button,
+                                  Controller preferred_ctrl) {
     Controller ctrl = preferred_ctrl;
     if (input->controller.devices[preferred_ctrl] == NULL) {
         ctrl = (preferred_ctrl == CONTROLLER_1) ? CONTROLLER_2 : CONTROLLER_1;
     }
 
-    return input->keyboard_state[button] == BUTTON_STATE_DOWN ||
-           input->keyboard_state[button] == BUTTON_STATE_HELD ||
-           input->controller.buttons[ctrl][button] == BUTTON_STATE_DOWN ||
-           input->controller.buttons[ctrl][button] == BUTTON_STATE_HELD ||
-           input->touch.buttons[button].state == BUTTON_STATE_DOWN ||
-           input->touch.buttons[button].state == BUTTON_STATE_HELD;
-}
-
-// Return true if the given button, preferably in the given controller, is down
-// but has not been held, meaning that its state is BUTTON_STATE_DOWN.
-bool controller_button_down_not_held(Input *input, Button button,
-                                     Controller preferred_ctrl) {
-    Controller ctrl = preferred_ctrl;
-    if (input->controller.devices[preferred_ctrl] == NULL) {
-        ctrl = (preferred_ctrl == CONTROLLER_1) ? CONTROLLER_2 : CONTROLLER_1;
-    }
-
-    return input->keyboard_state[button] == BUTTON_STATE_DOWN ||
-           input->controller.buttons[ctrl][button] == BUTTON_STATE_DOWN ||
-           input->touch.buttons[button].state == BUTTON_STATE_DOWN;
-}
-
-// Return true if the given button was just released, meaning that it's up but
-// its state has yet to change to BUTTON_STATE_UP.
-bool button_pressed_not_down(Input *input, Button button) {
-    return input->keyboard_state[button] == BUTTON_STATE_PRESSED ||
-           input->controller.buttons[CONTROLLER_1][button] ==
-               BUTTON_STATE_PRESSED ||
-           input->controller.buttons[CONTROLLER_2][button] ==
-               BUTTON_STATE_PRESSED ||
+    return input->keyboard_state[button] == BUTTON_STATE_JUST_PRESSED ||
+           input->keyboard_state[button] == BUTTON_STATE_PRESSED ||
+           input->controller.buttons[ctrl][button] ==
+               BUTTON_STATE_JUST_PRESSED ||
+           input->controller.buttons[ctrl][button] == BUTTON_STATE_PRESSED ||
+           input->touch.buttons[button].state == BUTTON_STATE_JUST_PRESSED ||
            input->touch.buttons[button].state == BUTTON_STATE_PRESSED;
+}
+
+// Return true the first frame the given button is registered as being pressed.
+bool is_button_just_pressed(Input *input, Button button) {
+    return input->keyboard_state[button] == BUTTON_STATE_JUST_PRESSED ||
+           input->controller.buttons[CONTROLLER_1][button] ==
+               BUTTON_STATE_JUST_PRESSED ||
+           input->controller.buttons[CONTROLLER_2][button] ==
+               BUTTON_STATE_JUST_PRESSED ||
+           input->touch.buttons[button].state == BUTTON_STATE_JUST_PRESSED;
+}
+
+// Return true the first frame the given button, preferably in the given
+// controller, is registered as being pressed.
+bool is_button_just_pressed_controller(Input *input, Button button,
+                                       Controller preferred_ctrl) {
+    Controller ctrl = preferred_ctrl;
+    if (input->controller.devices[preferred_ctrl] == NULL) {
+        ctrl = (preferred_ctrl == CONTROLLER_1) ? CONTROLLER_2 : CONTROLLER_1;
+    }
+
+    return input->keyboard_state[button] == BUTTON_STATE_JUST_PRESSED ||
+           input->controller.buttons[ctrl][button] ==
+               BUTTON_STATE_JUST_PRESSED ||
+           input->touch.buttons[button].state == BUTTON_STATE_JUST_PRESSED;
+}
+
+// Return true the first frame the given button is registered as released after
+// having been pressed.
+bool is_button_just_released(Input *input, Button button) {
+    return input->keyboard_state[button] == BUTTON_STATE_JUST_RELEASED ||
+           input->controller.buttons[CONTROLLER_1][button] ==
+               BUTTON_STATE_JUST_RELEASED ||
+           input->controller.buttons[CONTROLLER_2][button] ==
+               BUTTON_STATE_JUST_RELEASED ||
+           input->touch.buttons[button].state == BUTTON_STATE_JUST_RELEASED;
 }

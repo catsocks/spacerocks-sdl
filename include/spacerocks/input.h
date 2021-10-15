@@ -6,10 +6,10 @@
 #include "spacerocks/math.h"
 
 enum ButtonState {
-    BUTTON_STATE_UP,
-    BUTTON_STATE_DOWN,
-    BUTTON_STATE_HELD,
+    BUTTON_STATE_RELEASED,
+    BUTTON_STATE_JUST_PRESSED,
     BUTTON_STATE_PRESSED,
+    BUTTON_STATE_JUST_RELEASED,
 };
 
 typedef enum ButtonState ButtonState;
@@ -89,8 +89,9 @@ void input_check_finger_event(Input *input, Vec2D logical_size,
                               SDL_Event *event);
 void input_check_controller_device_event(Input *input, SDL_Event *event);
 void input_check_controller_button_event(Input *input, SDL_Event *event);
-bool button_down_not_held(Input *input, Button button);
-bool controller_button_down(Input *input, Button button, Controller controller);
-bool controller_button_down_not_held(Input *input, Button button,
-                                     Controller controller);
-bool button_pressed_not_down(Input *input, Button button);
+bool is_button_just_pressed(Input *input, Button button);
+bool is_button_pressed_controller(Input *input, Button button,
+                                  Controller preferred_ctrl);
+bool is_button_just_pressed_controller(Input *input, Button button,
+                                       Controller preferred_ctrl);
+bool is_button_just_released(Input *input, Button button);
