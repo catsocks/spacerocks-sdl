@@ -1,22 +1,22 @@
 # Spacerocks
 
-An [Asteroids](https://en.wikipedia.org/wiki/Asteroids_%28video_game%29)
-arcade game clone made with the [SDL](https://www.libsdl.org) cross-platform
-multimedia library for Windows, macOS, Linux and the browser.
+A clone of the [Asteroids](https://en.wikipedia.org/wiki/Asteroids_%28video_game%29)
+arcade game, made with the cross-platform [SDL](https://www.libsdl.org) library,
+for Windows, macOS, Linux, and the browser.
 
-You can play the game in your browser [here](https://catsocks.github.io/spacerocks-sdl)
-and download the game from the Releases page of the GitHub repository
-[here](https://github.com/catsocks/spacerocks-sdl/releases).
+You can play the game in your browser at
+[catsocks.github.io/spacerocks-sdl](https://catsocks.github.io/spacerocks-sdl),
+and [download executables](https://github.com/catsocks/spacerocks-sdl/releases)
+from the _Releases_ page of this project's GitHub repository.
 
-I aimed to make this clone almost identical to the original game, but since my
-primary motivation was to learn more about 2D game development, the game
-deviates from the original in some places, such as in the appearance of the
-spaceship and explosions.
+It looks and behaves a lot like the original, but it is not identical. Notably,
+the appearance of the spaceship, explosions, and the feel of the controls are
+very different.
 
-You can watch a video of Asteroids on Youtube
-[here](https://youtu.be/WYSupJ5r2zo) and play it with the
-[MAME](https://github.com/mamedev/mame) emulator provided you have an
-Asteroids ROM.
+You can [watch a video of Asteroids on Youtube](https://youtu.be/WYSupJ5r2zo)
+and play it with the
+[MAME](https://github.com/mamedev/mame) emulator, provided you have an Asteroids
+ROM.
 
 ## Features
 
@@ -86,9 +86,8 @@ The button names of a Xbox 360 controller are used.
 * [CMake](https://cmake.org)
 * Node.js (optional, used for building the website and the manual)
 
-Before using the Node.js scripts make sure to install their dependencies using
-the _install_ command of the npm command-line tool from the root folder of the
-project.
+Note that to use the Node.js scripts, you must first run `npm install` from the
+root folder of this project to install their dependencies.
 
 #### Libraries
 
@@ -147,8 +146,8 @@ Emscripten is used to create an executable that can be run in the browser.
 
 The only library you will have to install is PhysicsFS, because SDL will be
 automatically installed during compilation using
-[Emscripten Ports](https://emscripten.org/docs/compiling/Building-Projects.html#emscripten-ports)
-, and the OpenAL library that comes with Emscripten will be used.
+[Emscripten Ports](https://emscripten.org/docs/compiling/Building-Projects.html#emscripten-ports),
+and the OpenAL library that comes with Emscripten will be used.
 Unfortunately as of 2021-05-21 PhysicsFS is not included in Emscripten Ports.
 
 The build is configured the same way a native one is, except that the emcmake
