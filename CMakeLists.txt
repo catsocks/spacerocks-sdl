@@ -121,12 +121,9 @@ target_compile_options(spacerocks_lib PUBLIC
 
 target_link_libraries(spacerocks_lib PUBLIC ${PHYSFS_LIBRARY})
 
-# TODO: Figure out why adding the PhysicsFS include folder is needed for
-# physfs.h to be found from within the source files when cross-compiling with
-# Emscripten or MinGW but not in a native build.
-if(EMSCRIPTEN OR MINGW)
-  target_include_directories(spacerocks_lib PUBLIC ${PHYSFS_INCLUDE_DIR})
-endif()
+# TODO: Figure out why this is necessary for physfs.h to be found when compiling
+# with MinGW, Emscripten, and MSVC but not with GCC (natively on GNU/Linux).
+target_include_directories(spacerocks_lib PUBLIC ${PHYSFS_INCLUDE_DIR})
 
 add_executable(spacerocks src/main.c)
 
@@ -186,10 +183,11 @@ if (NOT EMSCRIPTEN)
     COMMAND
       ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/assets/game
       ${CMAKE_CURRENT_BINARY_DIR}/assets
-    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/assets)
+    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/assets/audio ${CMAKE_CURRENT_BINARY_DIR}/assets/images)
 
   # Create a ZIP archive of the assets files in the folder the executable will
   # be.
+  # FIXME: The wildcard operator doesn't seem to work on Windows.
   add_custom_target(
     spacerocks_archive_assets
     COMMAND ${CMAKE_COMMAND} -E tar cf ${CMAKE_CURRENT_BINARY_DIR}/assets *
