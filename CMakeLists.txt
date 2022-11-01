@@ -4,7 +4,9 @@ project(spacerocks C)
 # Prevent the assets being overwritten or being copied onto themselves.
 file(TO_CMAKE_PATH "${PROJECT_BINARY_DIR}/CMakeLists.txt" LOC_PATH)
 if(EXISTS "${LOC_PATH}")
-    message(FATAL_ERROR "You cannot build in a source directory (or any \
+  message(
+    FATAL_ERROR
+      "You cannot build in a source directory (or any \
 directory with a CMakeLists.txt file). Please make a build subdirectory. Feel \
 free to remove CMakeCache.txt and CMakeFiles.")
 endif()
@@ -41,7 +43,7 @@ find_program(NODE node nodejs)
 # Sometimes it is not necessary to link libm, when using MSVC for example.
 check_library_exists(m pow "" HAVE_LIBM)
 
-# When using Emscripten, SDL2 will be installed during compilation and OpenAL 
+# When using Emscripten, SDL2 will be installed during compilation and OpenAL
 # just has to be linked.
 if(NOT EMSCRIPTEN)
   find_package(SDL2 REQUIRED)
@@ -49,10 +51,9 @@ if(NOT EMSCRIPTEN)
 endif()
 
 # PhysFS isn't in the Emscripten Ports collection so it cannot be installed
-# during compilation by emcc.
-# You may want to pass -DCMAKE_PREFIX_PATH="/local" to CMake when configuring if
-# you've installed PhysicsFS to the Emscripten system/local or MinGW
-# sys-root/mingw/local folder.
+# during compilation by emcc. You may want to pass -DCMAKE_PREFIX_PATH="/local"
+# to CMake when configuring if you've installed PhysicsFS to the Emscripten
+# system/local or MinGW sys-root/mingw/local folder.
 find_package(PhysFS REQUIRED)
 
 set(SOURCES
@@ -77,16 +78,16 @@ set(SOURCES
     src/transition.c
     src/ui.c)
 
-# Create a library that includes all source files except for main so that it
-# may be used by the tests executables.
+# Create a library that includes all source files except for main so that it may
+# be used by the tests executables.
 add_library(spacerocks_lib STATIC ${SOURCES})
 
 # The header files are kept in a different folder because otherwise the tests
 # wouldn't be able to include SDL due to a name conflict between Spacerocks
 # math.h and the standard library math.h. It'd be nice to keep the headers in
 # src/.
-target_include_directories(spacerocks_lib PUBLIC
-                           ${CMAKE_CURRENT_SOURCE_DIR}/include)
+target_include_directories(spacerocks_lib
+                           PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 if(EMSCRIPTEN)
   # The Emscripten EM_ASM macro requires some extensions.
@@ -111,13 +112,15 @@ else()
   endif()
 endif()
 
-target_compile_options(spacerocks_lib PRIVATE
-  $<$<BOOL:${SR_DEBUG_BOUNDING_BOXES}>:-DDEBUG_BOUNDING_BOXES=1>
-  $<$<BOOL:${SR_DEBUG_RENDERED_TEXT_SIZE}>:-DDEBUG_RENDERED_TEXT_SIZE=1>
-  $<$<BOOL:${SR_DEBUG_TOUCH_BUTTONS}>:-DDEBUG_TOUCH_BUTTONS=1>)
+target_compile_options(
+  spacerocks_lib
+  PRIVATE $<$<BOOL:${SR_DEBUG_BOUNDING_BOXES}>:-DDEBUG_BOUNDING_BOXES=1>
+          $<$<BOOL:${SR_DEBUG_RENDERED_TEXT_SIZE}>:-DDEBUG_RENDERED_TEXT_SIZE=1>
+          $<$<BOOL:${SR_DEBUG_TOUCH_BUTTONS}>:-DDEBUG_TOUCH_BUTTONS=1>)
 
-target_compile_options(spacerocks_lib PUBLIC
-  $<$<OR:$<CONFIG:Debug>,$<BOOL:${SR_DEBUG}>>:-DDEBUG_SPACEROCKS>)
+target_compile_options(
+  spacerocks_lib
+  PUBLIC $<$<OR:$<CONFIG:Debug>,$<BOOL:${SR_DEBUG}>>:-DDEBUG_SPACEROCKS>)
 
 target_link_libraries(spacerocks_lib PUBLIC ${PHYSFS_LIBRARY})
 
@@ -131,15 +134,17 @@ target_link_libraries(spacerocks spacerocks_lib)
 
 if(MSVC OR MINGW)
   # TODO: Test that this works with MSVC.
-  target_sources(spacerocks PRIVATE
-                 ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/app.rc)
+  target_sources(spacerocks
+                 PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/src/windows/app.rc)
 
   set_target_properties(spacerocks PROPERTIES OUTPUT_NAME "Spacerocks")
 elseif(APPLE)
   # TODO: Test that this works.
-  set_target_properties(spacerocks PROPERTIES
-    MACOSX_BUNDLE ON
-    MACOSX_BUNDLE_INFO_PLIST ${CMAKE_CURRENT_SOURCE_DIR}/src/apple/Info.plist)
+  set_target_properties(
+    spacerocks
+    PROPERTIES MACOSX_BUNDLE ON
+               MACOSX_BUNDLE_INFO_PLIST
+               ${CMAKE_CURRENT_SOURCE_DIR}/src/apple/Info.plist)
 elseif(EMSCRIPTEN)
   set(SHELL_FILE ${CMAKE_CURRENT_SOURCE_DIR}/src/emscripten/shell.html)
 
@@ -151,10 +156,8 @@ elseif(EMSCRIPTEN)
                LINK_DEPENDS ${SHELL_FILE})
 
   target_link_options(
-    spacerocks
-    PRIVATE
-    --shell-file ${SHELL_FILE}
-    --preload-file ${CMAKE_CURRENT_SOURCE_DIR}/assets/game@assets)
+    spacerocks PRIVATE --shell-file ${SHELL_FILE} --preload-file
+    ${CMAKE_CURRENT_SOURCE_DIR}/assets/game@assets)
 
   # Allow for the output of the program to be shown in the emrun command-line
   # tool.
@@ -162,28 +165,30 @@ elseif(EMSCRIPTEN)
 
   # You probably want to set the URL environment variable used by the
   # build-website.js script and configure this project in Release mode when
-  # building this target.
-  # TODO: Consider implementing the build-website.js functionality with CMake.
+  # building this target. TODO: Consider implementing the build-website.js
+  # functionality with CMake.
   if(NODE)
     add_custom_target(
       spacerocks_website
       DEPENDS spacerocks
-      COMMAND ${NODE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/build-website.js
-        --assets-folder ${CMAKE_CURRENT_SOURCE_DIR}/assets/web
-        --build-folder ${CMAKE_CURRENT_BINARY_DIR}
-        --output-folder ${CMAKE_CURRENT_BINARY_DIR}/website
+      COMMAND
+        ${NODE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/build-website.js
+        --assets-folder ${CMAKE_CURRENT_SOURCE_DIR}/assets/web --build-folder
+        ${CMAKE_CURRENT_BINARY_DIR} --output-folder
+        ${CMAKE_CURRENT_BINARY_DIR}/website
       BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/website)
   endif()
 endif()
 
-if (NOT EMSCRIPTEN)
+if(NOT EMSCRIPTEN)
   # Copy assets files to where the executable will be.
   add_custom_target(
     spacerocks_copy_assets
     COMMAND
       ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/assets/game
       ${CMAKE_CURRENT_BINARY_DIR}/assets
-    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/assets/audio ${CMAKE_CURRENT_BINARY_DIR}/assets/images)
+    BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/assets/audio
+               ${CMAKE_CURRENT_BINARY_DIR}/assets/images)
 
   # Create a ZIP archive of the assets files in the folder the executable will
   # be.
@@ -205,9 +210,10 @@ if (NOT EMSCRIPTEN)
     # This target should be built when distributing the game.
     add_custom_target(
       spacerocks_manual
-      COMMAND ${NODE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/build-manual.js
-          --input ${CMAKE_CURRENT_SOURCE_DIR}/assets/web/index.html
-          --output-folder ${CMAKE_CURRENT_BINARY_DIR}
+      COMMAND
+        ${NODE} ${CMAKE_CURRENT_SOURCE_DIR}/tools/build-manual.js --input
+        ${CMAKE_CURRENT_SOURCE_DIR}/assets/web/index.html --output-folder
+        ${CMAKE_CURRENT_BINARY_DIR}
       WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/assets/web
       BYPRODUCTS ${CMAKE_CURRENT_BINARY_DIR}/Spacerocks.html)
   endif()
@@ -215,8 +221,8 @@ endif()
 
 # TODO: Figure out how to copy the DLLs of 3rd party libraries to the folder the
 # executable is in when compiling for Windows. Until then if the executables
-# complain about missing DLLs please copy them from the libraries' folders.
-# The DLLs of x86_64 MinGW libraries installed on Fedora using the dnf package
+# complain about missing DLLs please copy them from the libraries' folders. The
+# DLLs of x86_64 MinGW libraries installed on Fedora using the dnf package
 # manager are stored in /usr/x86_64-w64-mingw32/sys-root/mingw/bin.
 
 set(TESTS tests/lines.c tests/math.c tests/scoreboard.c)
@@ -227,7 +233,7 @@ if(BUILD_TESTING)
   # that cause ctest to fail running tests.
   if(EMSCRIPTEN)
     string(REPLACE "\"" "" CMAKE_CROSSCOMPILING_EMULATOR
-           ${CMAKE_CROSSCOMPILING_EMULATOR})
+                   ${CMAKE_CROSSCOMPILING_EMULATOR})
   endif()
 
   foreach(TEST ${TESTS})
